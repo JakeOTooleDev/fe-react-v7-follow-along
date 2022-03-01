@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import useBreedList from "./useBreedList";
 import Pet from "./Pet";
 
 const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
@@ -8,12 +9,14 @@ const SearchParams = () => {
   const [location, setLocation] = useState("");
   const [animal, setAnimal] = useState("");
   const [breed, setBreed] = useState("");
+  const [breedsList, status] = useBreedList(animal);
   const [pets, setPets] = useState([]);
 
   useEffect(() => {
     requestPets();
   }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
+  // inside the component for the purpose of closure. Gaurntees that the variable animal is always the value from our state variable animal
   async function requestPets() {
     const res = await fetch(
       `http://pets-v2.dev-apis.com/pets?animal=${animal}&location=${location}&breed=${breed}`
@@ -70,7 +73,7 @@ const SearchParams = () => {
             }}
           >
             <option />
-            {BREEDS.map((breed) => (
+            {breedsList.map((breed) => (
               <option key={breed} value={breed}>
                 {breed}
               </option>
