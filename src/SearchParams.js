@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
-import useBreedList from "./useBreedList";
 import Pet from "./Pet";
+import useBreedList from "./useBreedList";
 
 const ANIMALS = ["bird", "cat", "dog", "rabbit", "reptile"];
-const BREEDS = [];
 
 const SearchParams = () => {
   const [location, setLocation] = useState("");
   const [animal, setAnimal] = useState("");
   const [breed, setBreed] = useState("");
-  const [breedsList, status] = useBreedList(animal);
   const [pets, setPets] = useState([]);
+  const [breeds] = useBreedList(animal);
 
-  useEffect(() => {
-    requestPets();
-  }, []); //eslint-disable-line react-hooks/exhaustive-deps
+  // useEffect(() => {
+  //   requestPets();
+  // }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // inside the component for the purpose of closure. Gaurntees that the variable animal is always the value from our state variable animal
   async function requestPets() {
     const res = await fetch(
       `http://pets-v2.dev-apis.com/pets?animal=${animal}&location=${location}&breed=${breed}`
@@ -28,13 +26,18 @@ const SearchParams = () => {
 
   return (
     <div className="search-params">
-      <form>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          requestPets();
+        }}
+      >
         <label htmlFor="location">
           Location
           <input
             id="location"
             value={location}
-            placeholder="location"
+            placeholder="Location"
             onChange={(e) => setLocation(e.target.value)}
           />
         </label>
@@ -63,17 +66,14 @@ const SearchParams = () => {
         <label htmlFor="breed">
           Breed
           <select
+            disabled={!breeds.length}
             id="breed"
             value={breed}
-            onChange={(e) => {
-              setBreed(e.target.value);
-            }}
-            onBlur={(e) => {
-              setBreed(e.target.value);
-            }}
+            onChange={(e) => setBreed(e.target.value)}
+            onBlur={(e) => setBreed(e.target.value)}
           >
             <option />
-            {breedsList.map((breed) => (
+            {breeds.map((breed) => (
               <option key={breed} value={breed}>
                 {breed}
               </option>
